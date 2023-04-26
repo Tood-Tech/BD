@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `ToodDatabase`.`Empresa` (
   `idEmpresa` INT NOT NULL AUTO_INCREMENT,
   `razaoSocial` VARCHAR(45) NULL,
   `nomeFantasia` VARCHAR(45) NULL,
-  `cnpj` CHAR(14) NULL,
+  `cnpj` CHAR(30) NULL,
   `telefone` VARCHAR(13) NULL,
   `responsavel` VARCHAR(45) NULL,
   PRIMARY KEY (`idEmpresa`))
@@ -29,15 +29,15 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `ToodDatabase`.`Franquia`
+-- Table `ToodDatabase`.`Estabelecimento`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `ToodDatabase`.`Franquia` (
+CREATE TABLE IF NOT EXISTS `ToodDatabase`.`Estabelecimento` (
   `idEstabelecimento` INT NOT NULL AUTO_INCREMENT,
   `fkEmpresa` INT NOT NULL,
   `nome` VARCHAR(45) NULL,
   `cnpj` VARCHAR(45) NULL,
   `telefone` VARCHAR(45) NULL,
-  `Cep` VARCHAR(45) NULL,
+  `responsavel` VARCHAR(45) NULL,
   PRIMARY KEY (`idEstabelecimento`),
   INDEX `fk_Franquia_Empresa1_idx` (`fkEmpresa` ASC) VISIBLE,
   CONSTRAINT `fk_Franquia_Empresa1`
@@ -67,8 +67,8 @@ CREATE TABLE IF NOT EXISTS `ToodDatabase`.`Totem` (
   INDEX `fk_Totem_Estabelecimento1_idx` (`fkEstabelecimento` ASC) VISIBLE,
   CONSTRAINT `fk_Totem_Estabelecimento1`
     FOREIGN KEY (`fkEstabelecimento`)
-    REFERENCES `ToodDatabase`.`Franquia` (`idEstabelecimento`)
-    ON DELETE NO ACTION
+    REFERENCES `ToodDatabase`.`Estabelecimento` (`idEstabelecimento`)
+    ON DELETE CASCADE
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
@@ -150,7 +150,7 @@ CREATE TABLE IF NOT EXISTS `ToodDatabase`.`Endereco` (
   INDEX `fk_Endereco_Estabelecimento1_idx` (`fkEstabelecimento` ASC) VISIBLE,
   CONSTRAINT `fk_Endereco_Estabelecimento1`
     FOREIGN KEY (`fkEstabelecimento`)
-    REFERENCES `ToodDatabase`.`Franquia` (`idEstabelecimento`)
+    REFERENCES `ToodDatabase`.`Estabelecimento` (`idEstabelecimento`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
