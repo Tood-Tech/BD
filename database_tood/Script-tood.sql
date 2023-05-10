@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `ToodDatabase`.`Empresa` (
   `idEmpresa` INT NOT NULL AUTO_INCREMENT,
   `razaoSocial` VARCHAR(45) NULL,
   `nomeFantasia` VARCHAR(45) NULL,
-  `cnpj` CHAR(30) NULL,
+  `cnpj` CHAR(14) NULL,
   `telefone` VARCHAR(13) NULL,
   `responsavel` VARCHAR(45) NULL,
   PRIMARY KEY (`idEmpresa`))
@@ -29,16 +29,16 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `ToodDatabase`.`Estabelecimento`
+-- Table `ToodDatabase`.`Franquia`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `ToodDatabase`.`Estabelecimento` (
-  `idEstabelecimento` INT NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS `ToodDatabase`.`Franquia` (
+  `idFranquia` INT NOT NULL AUTO_INCREMENT,
   `fkEmpresa` INT NOT NULL,
   `nome` VARCHAR(45) NULL,
   `cnpj` VARCHAR(45) NULL,
   `telefone` VARCHAR(45) NULL,
-  `responsavel` VARCHAR(45) NULL,
-  PRIMARY KEY (`idEstabelecimento`),
+  `Cep` VARCHAR(45) NULL,
+  PRIMARY KEY (`idFranquia`),
   INDEX `fk_Franquia_Empresa1_idx` (`fkEmpresa` ASC) VISIBLE,
   CONSTRAINT `fk_Franquia_Empresa1`
     FOREIGN KEY (`fkEmpresa`)
@@ -53,22 +53,20 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `ToodDatabase`.`Totem` (
   `idTotem` INT NOT NULL AUTO_INCREMENT,
-  `fkEstabelecimento` INT NOT NULL,
+  `fkFranquia` INT NOT NULL,
   `numeroSerial` VARCHAR(45) NULL,
   `processador` VARCHAR(45) NULL,
   `alertaProcessador` INT NULL,
   `ram` VARCHAR(45) NULL,
   `alertaRam` INT NULL,
-  `gpu` VARCHAR(45) NULL,
-  `alertaGpu` INT NULL,
   `disco` VARCHAR(45) NULL,
   `alertaDisco` INT NULL,
-  PRIMARY KEY (`idTotem`, `fkEstabelecimento`),
-  INDEX `fk_Totem_Estabelecimento1_idx` (`fkEstabelecimento` ASC) VISIBLE,
+  PRIMARY KEY (`idTotem`, `fkFranquia`),
+  INDEX `fk_Totem_Estabelecimento1_idx` (`fkFranquia` ASC) VISIBLE,
   CONSTRAINT `fk_Totem_Estabelecimento1`
-    FOREIGN KEY (`fkEstabelecimento`)
-    REFERENCES `ToodDatabase`.`Estabelecimento` (`idEstabelecimento`)
-    ON DELETE CASCADE
+    FOREIGN KEY (`fkFranquia`)
+    REFERENCES `ToodDatabase`.`Franquia` (`idFranquia`)
+    ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
@@ -80,11 +78,14 @@ CREATE TABLE IF NOT EXISTS `ToodDatabase`.`DadoTotem` (
   `idDadosTotem` INT NOT NULL AUTO_INCREMENT,
   `fkTotem` INT NOT NULL,
   `dataHora` DATETIME NULL,
-  `qtdRam` DECIMAL(10,2) NULL,
-  `qtdGpu` DECIMAL(10,2) NULL,
-  `qtdDisco` DECIMAL(10,2) NULL,
-  `qtdProcessador` DECIMAL(10,2) NULL,
-  PRIMARY KEY (`idDadosTotem`, `fkTotem`),
+  `qtdRam` VARCHAR(45) NULL,
+  `qtdTotalDisco` VARCHAR(45) NULL,
+  `qtdProcessador` VARCHAR(45) NULL,
+  `qtdFaltaDisco` VARCHAR(45) NULL,
+  `qtdLeituraDisco` VARCHAR(45) NULL,
+  `qtdPacoteEnviado` VARCHAR(45) NULL,
+  `qtdPacoteRecebido` VARCHAR(45) NULL,
+  PRIMARY KEY (`idDadosTotem`),
   INDEX `fk_dados_sensores_idx` (`fkTotem` ASC) VISIBLE,
   CONSTRAINT `fk_dados_sensores`
     FOREIGN KEY (`fkTotem`)
@@ -140,17 +141,17 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `ToodDatabase`.`Endereco` (
   `idEndereco` INT NOT NULL AUTO_INCREMENT,
-  `fkEstabelecimento` INT NOT NULL,
+  `fkFranquia` INT NOT NULL,
   `logradouro` VARCHAR(45) NULL,
   `numero` INT NULL,
   `bairro` VARCHAR(45) NULL,
   `cidade` VARCHAR(45) NULL,
   `estado` CHAR(2) NULL,
   PRIMARY KEY (`idEndereco`),
-  INDEX `fk_Endereco_Estabelecimento1_idx` (`fkEstabelecimento` ASC) VISIBLE,
+  INDEX `fk_Endereco_Estabelecimento1_idx` (`fkFranquia` ASC) VISIBLE,
   CONSTRAINT `fk_Endereco_Estabelecimento1`
-    FOREIGN KEY (`fkEstabelecimento`)
-    REFERENCES `ToodDatabase`.`Estabelecimento` (`idEstabelecimento`)
+    FOREIGN KEY (`fkFranquia`)
+    REFERENCES `ToodDatabase`.`Franquia` (`idFranquia`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -159,4 +160,3 @@ ENGINE = InnoDB;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
