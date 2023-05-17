@@ -1,3 +1,4 @@
+drop database tooddatabase;
 -- MySQL Workbench Forward Engineering
 
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
@@ -21,26 +22,48 @@ CREATE TABLE IF NOT EXISTS `ToodDatabase`.`Empresa` (
   `idEmpresa` INT NOT NULL AUTO_INCREMENT,
   `razaoSocial` VARCHAR(45) NULL,
   `nomeFantasia` VARCHAR(45) NULL,
-  `cnpj` CHAR(14) NULL,
-  `telefone` VARCHAR(13) NULL,
+  `cnpj` VARCHAR(45) NULL,
+  `telefone` VARCHAR(45) NULL,
   `responsavel` VARCHAR(45) NULL,
   PRIMARY KEY (`idEmpresa`))
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `ToodDatabase`.`Franquia`
+-- Table `ToodDatabase`.`Usuario`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `ToodDatabase`.`Franquia` (
-  `idFranquia` INT NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS `ToodDatabase`.`Usuario` (
+  `idUsuario` INT NOT NULL AUTO_INCREMENT,
+  `fkEmpresa` INT NOT NULL,
+  `nomeUsuario` VARCHAR(45) NULL,
+  `email` VARCHAR(45) NULL,
+  `senha` VARCHAR(45) NULL,
+  `cargo` VARCHAR(45) NULL,
+  `telefone` VARCHAR(45) NULL,
+  `cpf` VARCHAR(45) NULL,
+  PRIMARY KEY (`idUsuario`, `fkEmpresa`),
+  INDEX `fk_Usuario_Empresa_idx` (`fkEmpresa` ASC) VISIBLE,
+  CONSTRAINT `fk_Usuario_Empresa`
+    FOREIGN KEY (`fkEmpresa`)
+    REFERENCES `ToodDatabase`.`Empresa` (`idEmpresa`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `ToodDatabase`.`estabelecimento`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ToodDatabase`.`estabelecimento` (
+  `idEstabelecimento` INT NOT NULL AUTO_INCREMENT,
   `fkEmpresa` INT NOT NULL,
   `nome` VARCHAR(45) NULL,
   `cnpj` VARCHAR(45) NULL,
   `telefone` VARCHAR(45) NULL,
-  `Cep` VARCHAR(45) NULL,
-  PRIMARY KEY (`idFranquia`),
-  INDEX `fk_Franquia_Empresa1_idx` (`fkEmpresa` ASC) VISIBLE,
-  CONSTRAINT `fk_Franquia_Empresa1`
+  `cep` VARCHAR(45) NULL,
+  INDEX `fk_table1_Empresa1_idx` (`fkEmpresa` ASC) VISIBLE,
+  PRIMARY KEY (`idEstabelecimento`),
+  CONSTRAINT `fk_table1_Empresa1`
     FOREIGN KEY (`fkEmpresa`)
     REFERENCES `ToodDatabase`.`Empresa` (`idEmpresa`)
     ON DELETE NO ACTION
@@ -53,7 +76,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `ToodDatabase`.`Totem` (
   `idTotem` INT NOT NULL AUTO_INCREMENT,
-  `fkFranquia` INT NOT NULL,
+  `fkEstabelecimento` INT NOT NULL,
   `numeroSerial` VARCHAR(45) NULL,
   `processador` VARCHAR(45) NULL,
   `alertaProcessador` INT NULL,
@@ -61,11 +84,11 @@ CREATE TABLE IF NOT EXISTS `ToodDatabase`.`Totem` (
   `alertaRam` INT NULL,
   `disco` VARCHAR(45) NULL,
   `alertaDisco` INT NULL,
-  PRIMARY KEY (`idTotem`, `fkFranquia`),
-  INDEX `fk_Totem_Estabelecimento1_idx` (`fkFranquia` ASC) VISIBLE,
-  CONSTRAINT `fk_Totem_Estabelecimento1`
-    FOREIGN KEY (`fkFranquia`)
-    REFERENCES `ToodDatabase`.`Franquia` (`idFranquia`)
+  PRIMARY KEY (`idTotem`, `fkEstabelecimento`),
+  INDEX `fk_Totem_estabelecimento1_idx` (`fkEstabelecimento` ASC) VISIBLE,
+  CONSTRAINT `fk_Totem_estabelecimento1`
+    FOREIGN KEY (`fkEstabelecimento`)
+    REFERENCES `ToodDatabase`.`estabelecimento` (`idEstabelecimento`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -76,7 +99,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `ToodDatabase`.`DadoTotem` (
   `idDadosTotem` INT NOT NULL AUTO_INCREMENT,
-  `fkTotem` INT NOT NULL,
+  `fkTotem` INT,
   `dataHora` DATETIME NULL,
   `qtdRam` VARCHAR(45) NULL,
   `qtdTotalDisco` VARCHAR(45) NULL,
@@ -86,51 +109,10 @@ CREATE TABLE IF NOT EXISTS `ToodDatabase`.`DadoTotem` (
   `qtdPacoteEnviado` VARCHAR(45) NULL,
   `qtdPacoteRecebido` VARCHAR(45) NULL,
   PRIMARY KEY (`idDadosTotem`),
-  INDEX `fk_dados_sensores_idx` (`fkTotem` ASC) VISIBLE,
-  CONSTRAINT `fk_dados_sensores`
+  INDEX `fk_DadoTotem_Totem1_idx` (`fkTotem` ASC) VISIBLE,
+  CONSTRAINT `fk_DadoTotem_Totem1`
     FOREIGN KEY (`fkTotem`)
     REFERENCES `ToodDatabase`.`Totem` (`idTotem`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `ToodDatabase`.`Usuario`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `ToodDatabase`.`Usuario` (
-  `idUsuario` INT NOT NULL AUTO_INCREMENT,
-  `fkEmpresa` INT NOT NULL,
-  `nomeUsuario` VARCHAR(45) NULL,
-  `email` VARCHAR(50) NULL,
-  `senha` VARCHAR(16) NULL,
-  `cargo` VARCHAR(20) NULL,
-  `telefone` VARCHAR(45) NULL,
-  `cpf` VARCHAR(45) NULL,
-  PRIMARY KEY (`idUsuario`, `fkEmpresa`),
-  INDEX `fk_Usuario_Empresa1_idx` (`fkEmpresa` ASC) VISIBLE,
-  CONSTRAINT `fk_Usuario_Empresa1`
-    FOREIGN KEY (`fkEmpresa`)
-    REFERENCES `ToodDatabase`.`Empresa` (`idEmpresa`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `ToodDatabase`.`AlertaSensor`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `ToodDatabase`.`AlertaSensor` (
-  `idAlertaSensor` INT NOT NULL AUTO_INCREMENT,
-  `fkDadoTotem` INT NOT NULL,
-  `fkTotem` INT NOT NULL,
-  `dtAlerta` DATETIME NULL,
-  `tipo` VARCHAR(45) NULL,
-  PRIMARY KEY (`idAlertaSensor`, `fkDadoTotem`, `fkTotem`),
-  INDEX `fk_AlertaSensor_DadoTotem1_idx` (`fkDadoTotem` ASC, `fkTotem` ASC) VISIBLE,
-  CONSTRAINT `fk_AlertaSensor_DadoTotem1`
-    FOREIGN KEY (`fkDadoTotem` , `fkTotem`)
-    REFERENCES `ToodDatabase`.`DadoTotem` (`idDadosTotem` , `fkTotem`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -146,12 +128,31 @@ CREATE TABLE IF NOT EXISTS `ToodDatabase`.`Endereco` (
   `numero` INT NULL,
   `bairro` VARCHAR(45) NULL,
   `cidade` VARCHAR(45) NULL,
-  `estado` CHAR(2) NULL,
+  `estado` VARCHAR(45) NULL,
   PRIMARY KEY (`idEndereco`),
-  INDEX `fk_Endereco_Estabelecimento1_idx` (`fkFranquia` ASC) VISIBLE,
-  CONSTRAINT `fk_Endereco_Estabelecimento1`
+  INDEX `fk_Endereco_estabelecimento1_idx` (`fkFranquia` ASC) VISIBLE,
+  CONSTRAINT `fk_Endereco_estabelecimento1`
     FOREIGN KEY (`fkFranquia`)
-    REFERENCES `ToodDatabase`.`Franquia` (`idFranquia`)
+    REFERENCES `ToodDatabase`.`estabelecimento` (`idEstabelecimento`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `ToodDatabase`.`ComandoJava`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ToodDatabase`.`ComandoJava` (
+  `idComandoJava` INT NOT NULL AUTO_INCREMENT,
+  `fkTotem` INT NOT NULL,
+  `fkEstabelecimento` INT NOT NULL,
+  `executarComando` VARCHAR(45) NULL,
+  `comando` VARCHAR(255) NULL,
+  PRIMARY KEY (`idComandoJava`, `fkTotem`, `fkEstabelecimento`),
+  INDEX `fk_ComandoJava_Totem1_idx` (`fkTotem` ASC, `fkEstabelecimento` ASC) VISIBLE,
+  CONSTRAINT `fk_ComandoJava_Totem1`
+    FOREIGN KEY (`fkTotem` , `fkEstabelecimento`)
+    REFERENCES `ToodDatabase`.`Totem` (`idTotem` , `fkEstabelecimento`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
